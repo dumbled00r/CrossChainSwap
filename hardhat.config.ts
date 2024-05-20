@@ -4,6 +4,7 @@ import "hardhat-deploy";
 import "@nomicfoundation/hardhat-ethers";
 import { Chain } from "./constants/chains";
 import dotenv from "dotenv";
+import "./tasks/inheritContract";
 dotenv.config();
 
 const privateKey = process.env.PRIVATE_KEY || "";
