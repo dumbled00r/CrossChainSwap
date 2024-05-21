@@ -6,7 +6,7 @@ export enum Chain {
 }
 
 export const GMPChainId = {
-  [Chain.AVALANCHE]: "Avalanche",
+  [Chain.AVALANCHE]: "avalanche",
   [Chain.ETHEREUM]: "ethereum-sepolia",
 };
 
