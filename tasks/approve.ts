@@ -17,12 +17,18 @@ task("approve", "Approve USDC given to given `spender`")
 
     const contract = new ethers.Contract(tokenAddress, erc20Abi, deployer);
     const allowance = await contract.allowance(deployer.address, spender);
-    if (allowance.eq("0")) {
-      const tx = await contract
-        .approve(spender, ethers.MaxUint256)
-        .then((tx: any) => tx.wait());
-      console.log(`Approved USDC:`, tx.transactionHash);
-    } else {
-      console.log("Already approved", "USDC");
-    }
+    console.log("Allowance:", allowance.toString());
+
+    const tx = await contract
+      .approve(spender, ethers.MaxUint256)
+      .then((tx: any) => tx.wait());
+    // if (allowance == 0) {
+    //   const tx = await contract
+    //     .approve(spender, ethers.MaxUint256)
+    //     .then((tx: any) => tx.wait());
+    //   console.log(`Approved USDC:`, tx.transactionHash);
+    // } else {
+    //   console.log("Already approved", "USDC");
+    //   console.log("Allowance:", allowance.toString());
+    // }
   });

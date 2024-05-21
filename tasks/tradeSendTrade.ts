@@ -53,7 +53,7 @@ task(
     const srcUsdcAddress = USDC[chainName];
     const destUsdcAddress = USDC[destinationChain as Chain];
     const subunitAmount = ethers.parseEther(amount);
-
+    console.log(subunitAmount);
     // Step 1: Create the tradeData for the trade
     const tradeDataSrc = createSrcTradeData(
       [WRAPPED_NATIVE_ASSET[chainName], srcUsdcAddress],
@@ -89,18 +89,22 @@ task(
         fallbackRecipient,
         inputPos,
         {
-          value: subunitAmount + gasFee,
+          value: subunitAmount + BigInt(gasFee),
+          gasLimit: 1000000,
         }
       )
       .then((tx: any) => tx.wait());
 
-    console.log("Tx Hash:", tx.transactionHash);
+    console.log("Tx Hash:", tx.hash);
 
     // Step 3: Relay the USDC to destination chain
-    await relayUSDC(tx.transactionHash, chainName, deployer);
+    await relayUSDC(tx.hash, chainName, deployer);
 
     console.log(
       "Continue tracking at",
-      `https://testnet.axelarscan.io/gmp/${tx.transactionHash}`
+      `https://testnet.axelarscan.io/gmp/${tx.hash}`
     );
   });
+
+//10000000000n
+//10000000000225319430265931

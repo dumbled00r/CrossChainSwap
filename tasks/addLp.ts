@@ -27,9 +27,9 @@ task(
     const contract = new ethers.Contract(routerAddress, abi, deployer);
 
     // Approve if needed
-    await hre.run("approve", {
-      spender: routerAddress,
-    });
+    // await hre.run("approve", {
+    //   spender: routerAddress,
+    // });
 
     const deadline = Math.floor(new Date().getTime() / 1000) + 60 * 20;
     const amountTokenErc20 = ethers.parseUnits(amountErc20, 6);
@@ -42,8 +42,12 @@ task(
       0,
       deployer.address,
       deadline,
-      { value: amountTokenNative }
+      { value: amountTokenNative, gasLimit: 300000 }
     );
 
     console.log("Tx: ", tx.hash);
   });
+
+// avalanche: https://testnet.snowtrace.io/tx/0xdf94748fbba317defd6150be23e18975aa9de2366f8f0c9d6c8d761be1874328
+// We can also add Pool using uniswap's instance: https://uniswap.sourcehat.com/#/add/v2/ETH/0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+// https://sepolia.etherscan.io/tx/0x661bd3d5001cfe4d8745317dab77802d05c6dfe7821cf70510235fbc144b59c1

@@ -93,7 +93,7 @@ export const relayUSDC = async (
         .receiveMessage(message, signature)
         .then((tx: any) => tx.wait());
 
-      console.log("Minted USDC", receipt.transactionHash);
+      console.log("Minted USDC", receipt.hash);
     }
   }
 };
