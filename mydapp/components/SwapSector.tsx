@@ -2,15 +2,18 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 
 const SwapSector = () => {
   const [senderAsset, setSenderAsset] = useState("AVAX");
   const [recipientAsset, setRecipientAsset] = useState("ETH");
+  const [amount, setAmount] = useState("");
+
+  const account = useAccount();
 
   const assets = [
     { name: "AVAX", image: "/assets/images/AVAX.png" },
     { name: "ETH", image: "/assets/images/ETH.png" },
-    // Add more assets as needed
   ];
 
   return (
@@ -52,6 +55,11 @@ const SwapSector = () => {
               <input
                 dir="RTL"
                 type="text"
+                value={amount}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  console.log(`Current input amount: ${amount}`);
+                }}
                 className="bg-transparent border-none text-white flex-grow outline-none font-bold caret-transparent"
               />
               <button className="bg-[#34D399] text-black px-4 py-2 rounded-lg font-bold">
@@ -110,10 +118,15 @@ const SwapSector = () => {
               <span>0.00012 ETH</span>
             </div>
           </div>
-
-          <button className="w-full bg-[#8B5CF6] text-white py-3 rounded-lg mt-4 font-bold text-lg">
-            SWAP
-          </button>
+          {account.isConnected ? (
+            <button className="w-full bg-[#8B5CF6] text-white py-3 rounded-lg mt-4 font-bold text-lg">
+              SWAP
+            </button>
+          ) : (
+            <button className="w-full bg-[#391983] text-white py-3 rounded-lg mt-4 font-bold text-lg">
+              PLEASE CONNECT WALLET
+            </button>
+          )}
         </div>
       </div>
     </div>

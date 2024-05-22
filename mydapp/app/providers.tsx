@@ -11,15 +11,18 @@ import {
   trustWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import dotenv from "dotenv";
 import * as React from "react";
 import { WagmiProvider } from "wagmi";
 import { avalancheFuji, sepolia } from "wagmi/chains";
 
 const { wallets } = getDefaultWallets();
+dotenv.config();
 
+const projectId = process.env.NEXT_PUBLIC_RAINBOW_PROJECT_ID || "";
 const config = getDefaultConfig({
   appName: "RainbowKit demo",
-  projectId: "YOUR_PROJECT_ID",
+  projectId: projectId,
   wallets: [
     ...wallets,
     {
