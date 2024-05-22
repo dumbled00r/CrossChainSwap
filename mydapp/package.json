@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@axelar-network/axelarjs-sdk": "^0.16.0",
     "@rainbow-me/rainbowkit": "^2.1.0",
     "@tanstack/react-query": "^5.37.1",
     "class-variance-authority": "^0.7.0",

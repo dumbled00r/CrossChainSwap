@@ -2,14 +2,24 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useBalance, useChainId } from "wagmi";
 
 const SwapSector = () => {
   const [senderAsset, setSenderAsset] = useState("AVAX");
   const [recipientAsset, setRecipientAsset] = useState("ETH");
   const [amount, setAmount] = useState("");
 
+  /* To do: Set fees/ Estimated output/ swap */
+  const [fee, setFee] = useState("");
+
   const account = useAccount();
+  const chainId = useChainId();
+  const { data, isError, isLoading } = useBalance({
+    address: account.address,
+    chainId: chainId,
+  });
+
+  async function estimateFee() {}
 
   const assets = [
     { name: "AVAX", image: "/assets/images/AVAX.png" },
@@ -58,11 +68,16 @@ const SwapSector = () => {
                 value={amount}
                 onChange={(e) => {
                   setAmount(e.target.value);
-                  console.log(`Current input amount: ${amount}`);
+                  // This one will set the estimate fee
                 }}
                 className="bg-transparent border-none text-white flex-grow outline-none font-bold caret-transparent"
               />
-              <button className="bg-[#34D399] text-black px-4 py-2 rounded-lg font-bold">
+              <button
+                className="bg-[#34D399] text-black px-4 py-2 rounded-lg font-bold"
+                onClick={(e) => {
+                  setAmount(data?.formatted.slice(0, 10) || "");
+                }}
+              >
                 MAX
               </button>
             </div>
@@ -111,7 +126,9 @@ const SwapSector = () => {
           <div className="bg-[#A0DEFF] p-4 rounded-lg space-y-2">
             <div className="flex justify-between text-white font-bold">
               <span>Network Fee:</span>
-              <span>0.00012 AVAX</span>
+              <span>
+                {fee} {data?.symbol}
+              </span>
             </div>
             <div className="flex justify-between text-white font-bold">
               <span>Estimated output:</span>
