@@ -28,7 +28,7 @@ const getMessageSentEvent = (
   return null;
 };
 
-async function fetchAttestation(messageHash: string, maxAttempt = 10) {
+async function fetchAttestation(messageHash: string, maxAttempt = 1000) {
   let attempt = 0;
   while (attempt < maxAttempt) {
     const _response = await fetch(
