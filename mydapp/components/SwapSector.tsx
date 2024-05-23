@@ -1,5 +1,10 @@
 "use client";
 
+import { ROUTER } from "@/constants/addresses";
+import { Chain, ChainIdToName, ChainToId } from "@/constants/chains";
+import { estimateFee } from "@/utils/estimateFee";
+import { estimateSwapOutputAmount } from "@/utils/estimateOutput";
+import { ethers } from "ethers";
 import Image from "next/image";
 import { useState } from "react";
 import { useAccount, useBalance, useChainId } from "wagmi";
@@ -10,7 +15,8 @@ const SwapSector = () => {
   const [amount, setAmount] = useState("");
 
   /* To do: Set fees/ Estimated output/ swap */
-  const [fee, setFee] = useState("");
+  const [fee, setFee] = useState("0");
+  const [output, setOutput] = useState("0");
 
   const account = useAccount();
   const chainId = useChainId();
@@ -19,7 +25,66 @@ const SwapSector = () => {
     chainId: chainId,
   });
 
-  async function estimateFee() {}
+  const handleInputChange = async (e: any) => {
+    const newValue = e.target.value;
+    setAmount(newValue);
+    if (Number(newValue) > 0) {
+      const fee = await estimateFee(
+        ChainIdToName[chainId],
+        ChainIdToName[chainId] === Chain.AVALANCHE
+          ? Chain.ETHEREUM
+          : Chain.AVALANCHE
+      );
+      setFee(fee);
+
+      let _newValue = ethers.parseEther(newValue);
+      console.log(_newValue);
+      console.log(
+        `Router: ${ROUTER[ChainIdToName[chainId]]}`,
+        `ChainId: ${chainId}`,
+        `Amount: ${_newValue.toString()}`,
+        `NativeToErc20: true`
+      );
+      const output1 = await estimateSwapOutputAmount({
+        routerAddress: ROUTER[ChainIdToName[chainId]],
+        chainId: chainId,
+        amount: _newValue.toString(),
+        nativeToErc20: true,
+      });
+
+      console.log(`Output1: ${ethers.formatEther(output1)}`);
+      _newValue = output1 || _newValue;
+
+      // if (BigInt(_newValue) < BigInt(0)) {
+      //   console.log("Amount too low");
+      // }
+
+      let destOutput = await estimateSwapOutputAmount({
+        routerAddress:
+          ROUTER[
+            ChainIdToName[chainId] === Chain.AVALANCHE
+              ? Chain.ETHEREUM
+              : Chain.AVALANCHE
+          ],
+        chainId:
+          ChainToId[
+            ChainIdToName[chainId] === Chain.AVALANCHE
+              ? Chain.ETHEREUM
+              : Chain.AVALANCHE
+          ],
+        amount: _newValue.toString(),
+        nativeToErc20: false,
+      });
+      setOutput(ethers.formatEther(destOutput).toString());
+    } else {
+      setFee("0");
+      setOutput("0");
+    }
+  };
+
+  const handleSwap = async (e: any) => {
+    console.log(`Swapping ${amount} ${senderAsset} to ${recipientAsset}`);
+  };
 
   const assets = [
     { name: "AVAX", image: "/assets/images/AVAX.png" },
@@ -34,7 +99,10 @@ const SwapSector = () => {
         </h2>
         <div className="space-y-6">
           <div>
-            <label className="block text-lg font-bold text-white">Source</label>
+            <label className="block text-lg font-bold text-white">
+              Source:
+              {" " + ChainIdToName[chainId].toUpperCase()}
+            </label>
             <div className="flex items-center mt-2 space-x-4 bg-[#A0DEFF] p-4 rounded-lg">
               <div className="flex items-center space-x-2">
                 <select
@@ -66,9 +134,8 @@ const SwapSector = () => {
                 dir="RTL"
                 type="text"
                 value={amount}
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                  // This one will set the estimate fee
+                onChange={async (e) => {
+                  await handleInputChange(e);
                 }}
                 className="bg-transparent border-none text-white flex-grow outline-none font-bold caret-transparent"
               />
@@ -85,7 +152,10 @@ const SwapSector = () => {
 
           <div>
             <label className="block text-lg font-bold text-white">
-              Destination
+              Destination:{" "}
+              {ChainIdToName[chainId] === Chain.AVALANCHE
+                ? Chain.ETHEREUM.toUpperCase()
+                : Chain.AVALANCHE.toUpperCase()}
             </label>
             <div className="flex items-center mt-2 space-x-4 bg-[#A0DEFF] p-4 rounded-lg">
               <div className="flex items-center space-x-2">
@@ -115,9 +185,10 @@ const SwapSector = () => {
                 />
               </div>
               <input
+                dir="RTL"
                 type="text"
-                className="bg-transparent text-white flex-grow outline-none font-bold border-5"
-                value=""
+                className="bg-transparent border-none text-white flex-grow outline-none font-bold caret-transparent"
+                value={`${output.substring(0, 10)}`}
                 readOnly
               />
             </div>
@@ -132,11 +203,18 @@ const SwapSector = () => {
             </div>
             <div className="flex justify-between text-white font-bold">
               <span>Estimated output:</span>
-              <span>0.00012 ETH</span>
+              <span>
+                {output} {data?.symbol === "AVAX" ? "ETH" : "AVAX"}
+              </span>
             </div>
           </div>
           {account.isConnected ? (
-            <button className="w-full bg-[#8B5CF6] text-white py-3 rounded-lg mt-4 font-bold text-lg">
+            <button
+              className="w-full bg-[#8B5CF6] text-white py-3 rounded-lg mt-4 font-bold text-lg"
+              onClick={async (e) => {
+                await handleSwap(e);
+              }}
+            >
               SWAP
             </button>
           ) : (
