@@ -52,7 +52,6 @@ const SwapSector = () => {
         nativeToErc20: true,
       });
 
-      console.log(`Output1: ${ethers.formatEther(output1)}`);
       _newValue = output1 || _newValue;
 
       // if (BigInt(_newValue) < BigInt(0)) {
@@ -134,6 +133,7 @@ const SwapSector = () => {
                 dir="RTL"
                 type="text"
                 value={amount}
+                id="amountSwap"
                 onChange={async (e) => {
                   await handleInputChange(e);
                 }}
@@ -141,8 +141,11 @@ const SwapSector = () => {
               />
               <button
                 className="bg-[#34D399] text-black px-4 py-2 rounded-lg font-bold"
-                onClick={(e) => {
-                  setAmount(data?.formatted.slice(0, 10) || "");
+                onClick={async (e) => {
+                  const newValue = data?.formatted.slice(0, 10) || "";
+                  setAmount(newValue);
+                  // Simulate an input change event
+                  await handleInputChange({ target: { value: newValue } });
                 }}
               >
                 MAX
