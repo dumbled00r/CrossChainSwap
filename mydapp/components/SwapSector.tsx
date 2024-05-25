@@ -1,14 +1,25 @@
 "use client";
 
-import { ROUTER } from "@/constants/addresses";
+import { CROSSCHAIN_NATIVE_SWAP, ROUTER } from "@/constants/addresses";
 import { Chain, ChainIdToName, ChainToId } from "@/constants/chains";
+import { useEthersProvider } from "@/utils/clientToProvider";
+import { useEthersSigner } from "@/utils/clientToSigner";
 import { estimateFee } from "@/utils/estimateFee";
 import { estimateSwapOutputAmount } from "@/utils/estimateOutput";
+import { prepareSendTrade } from "@/utils/sendTrade";
+import { relayUSDC } from "@/utils/swap/relayUSDC";
 import { ethers } from "ethers";
 import Image from "next/image";
-import { useState } from "react";
-import { useAccount, useBalance, useChainId } from "wagmi";
-
+import { useEffect, useState } from "react";
+import {
+  useAccount,
+  useBalance,
+  useChainId,
+  useSwitchChain,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import crossChainNativeSwap from "../constants/abis/CrosschainNativeSwap.json";
 const SwapSector = () => {
   const [senderAsset, setSenderAsset] = useState("AVAX");
   const [recipientAsset, setRecipientAsset] = useState("ETH");
@@ -20,10 +31,32 @@ const SwapSector = () => {
 
   const account = useAccount();
   const chainId = useChainId();
+  const provider = useEthersProvider({
+    chainId:
+      ChainToId[
+        ChainIdToName[chainId] === Chain.AVALANCHE
+          ? Chain.ETHEREUM
+          : Chain.AVALANCHE
+      ],
+  });
+  const { chains, switchChain } = useSwitchChain();
+  const signer = useEthersSigner({
+    chainId: chainId,
+  });
+  const signer2 = useEthersSigner({
+    chainId:
+      ChainToId[
+        ChainIdToName[chainId] === Chain.AVALANCHE
+          ? Chain.ETHEREUM
+          : Chain.AVALANCHE
+      ],
+  });
   const { data, isError, isLoading } = useBalance({
     address: account.address,
     chainId: chainId,
   });
+
+  const { data: hash, error, writeContractAsync } = useWriteContract();
 
   const handleInputChange = async (e: any) => {
     const newValue = e.target.value;
@@ -83,13 +116,76 @@ const SwapSector = () => {
 
   const handleSwap = async (e: any) => {
     console.log(`Swapping ${amount} ${senderAsset} to ${recipientAsset}`);
+
+    const data = await prepareSendTrade({
+      amount: amount,
+      srcChain: ChainIdToName[chainId],
+      destChain:
+        ChainIdToName[chainId] === Chain.AVALANCHE
+          ? Chain.ETHEREUM
+          : Chain.AVALANCHE,
+      address: `0x${account.address?.substring(2)}` || "",
+    });
+
+    try {
+      writeContractAsync({
+        address: `0x${CROSSCHAIN_NATIVE_SWAP[ChainIdToName[chainId]].substring(
+          2
+        )}`,
+        abi: crossChainNativeSwap,
+        functionName: "nativeTradeSendTrade",
+        args: [
+          data?.destChainId,
+          data?.tradeDataSrc,
+          data?.tradeDataDest,
+          data?.traceId,
+          data?.fallbackRecipient,
+          data?.inputPos,
+        ],
+        chainId: chainId,
+        value: ethers.parseEther(amount) + ethers.parseEther(fee),
+        gas: BigInt(1000000),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    return;
   };
 
   const assets = [
     { name: "AVAX", image: "/assets/images/AVAX.png" },
     { name: "ETH", image: "/assets/images/ETH.png" },
   ];
-
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash });
+  useEffect(() => {
+    if (isConfirmed && hash && chainId && signer && signer2) {
+      const callRelay = async () => {
+        try {
+          switchChain({
+            chainId:
+              ChainToId[
+                ChainIdToName[chainId] === Chain.AVALANCHE
+                  ? Chain.ETHEREUM
+                  : Chain.AVALANCHE
+              ],
+          });
+          await relayUSDC(hash, ChainIdToName[chainId], signer, signer2);
+          switchChain({
+            chainId:
+              ChainToId[
+                ChainIdToName[chainId] === Chain.AVALANCHE
+                  ? Chain.AVALANCHE
+                  : Chain.ETHEREUM
+              ],
+          });
+        } catch (error) {
+          console.error("Failed to relay USDC:", error);
+        }
+      };
+      callRelay();
+    }
+  }, [isConfirmed, hash, chainId, signer, signer2, switchChain]);
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#CAF4FF]">
       <div className="bg-[#5AB2FF] p-8 rounded-3xl shadow-lg max-w-lg w-full mt-[-150px]">
@@ -227,6 +323,7 @@ const SwapSector = () => {
           )}
         </div>
       </div>
+      {hash && <div>Transaction hash: {hash}</div>}
     </div>
   );
 };
