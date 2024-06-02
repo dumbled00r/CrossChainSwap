@@ -10,6 +10,7 @@ import { prepareSendTrade } from "@/utils/sendTrade";
 import { relayUSDC } from "@/utils/swap/relayUSDC";
 import { ethers } from "ethers";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   useAccount,
@@ -187,7 +188,7 @@ const SwapSector = () => {
     }
   }, [isConfirmed, hash, chainId, signer, signer2, switchChain]);
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#CAF4FF]">
+    <div className="flex items-center justify-center min-h-screen bg-[#CAF4FF] flex-col">
       <div className="bg-[#5AB2FF] p-8 rounded-3xl shadow-lg max-w-lg w-full mt-[-150px]">
         <h2 className="text-center text-3xl font-bold text-white mb-8">
           Crosschain Swap ✨
@@ -323,7 +324,13 @@ const SwapSector = () => {
           )}
         </div>
       </div>
-      {hash && <div>Transaction hash: {hash}</div>}
+      {hash && (
+        <div className="mt-5 text-red-500">
+          Track your transaction here:
+          <Link href={`https://testnet.axelarscan.io/gmp/${hash}`}></Link>
+        </div>
+      )}
+      {error && <div className="text-red-500">{error.message}</div>}
     </div>
   );
 };
