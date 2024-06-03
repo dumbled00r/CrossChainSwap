@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Cross-Chain Swap Using Axelar Network and USD-Circle (USDC/CCTP)
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+Welcome to the Cross-Chain Swap application, a powerful tool designed to facilitate the seamless transfer of USD-Circle (USDC) across different blockchain networks utilizing the Axelar GMP and Circle CCTP. This README provides a comprehensive guide on setting up and using the application, ensuring a smooth and secure cross-chain transaction experience.
+
+## Features
+
+- **Cross-Chain Swapping:** Easily swap tokens between supported blockchains.
+- **Integration with Axelar and Circle:** Utilize Axelar's and Circle's secure and efficient cross-chain communication.
+- **User-Friendly Interface:** Simple and intuitive user interactions for all operations.
+
+## Prerequisites
+
+Before you start, ensure you have the following installed:
+
+- Node.js (v18 or higher)
+- Yarn or npm
+- Git
+
+## Installation
+
+Clone the repository and install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/dumbled00r/CrossChainSwap
+cd CrossChainSwap
+yarn
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After that, you want to modify the `.env.example` file to `.env`, and fill in the details here
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Executing swap:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+yarn task tradeSendTrade amount destChain --network srcChain
+```
 
-## Learn More
+Example of swap from Avalanche to Ethereum:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+yarn task tradeSendTrade 0.01 ethereum --network avalanche
+```

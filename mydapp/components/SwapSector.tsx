@@ -327,7 +327,12 @@ const SwapSector = () => {
       {hash && (
         <div className="mt-5 text-red-500">
           Track your transaction here:
-          <Link href={`https://testnet.axelarscan.io/gmp/${hash}`}></Link>
+          <Link
+            href={`https://testnet.axelarscan.io/gmp/${hash}`}
+            className="underline"
+          >
+            Axelar GMP Scan
+          </Link>
         </div>
       )}
       {error && <div className="text-red-500">{error.message}</div>}

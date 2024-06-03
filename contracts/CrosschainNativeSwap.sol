@@ -95,7 +95,7 @@ contract CrosschainNativeSwap is AxelarExecutable, Ownable {
             this.siblings(destinationChain)
         );
 
-        // encode the payload to send to the sibling contract
+        // encode the payload to send to the sibling contract (the connected contract)
         bytes memory payload = abi.encode(
             destTradeData,
             usdcAmount,
@@ -225,7 +225,6 @@ contract CrosschainNativeSwap is AxelarExecutable, Ownable {
         if (!swapSuccess)
             return _refund(traceId, usdcAmount, fallbackRecipient);
 
-        // Emit success event so that our application can be notified.
         emit SwapSuccess(traceId, usdcAmount, tradeData);
     }
 }
