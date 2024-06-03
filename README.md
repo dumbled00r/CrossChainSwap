@@ -1,13 +1,43 @@
-# Sample Hardhat Project
+# Cross-Chain Swap Using Axelar Network and USD-Circle (USDC/CCTP)
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+## Introduction
 
-Try running some of the following tasks:
+Welcome to the Cross-Chain Swap application, a powerful tool designed to facilitate the seamless transfer of USD-Circle (USDC) across different blockchain networks utilizing the Axelar GMP and Circle CCTP. This README provides a comprehensive guide on setting up and using the application, ensuring a smooth and secure cross-chain transaction experience.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
+## Features
+
+- **Cross-Chain Swapping:** Easily swap tokens between supported blockchains.
+- **Integration with Axelar and Circle:** Utilize Axelar's and Circle's secure and efficient cross-chain communication.
+- **User-Friendly Interface:** Simple and intuitive user interactions for all operations.
+
+## Prerequisites
+
+Before you start, ensure you have the following installed:
+
+- Node.js (v18 or higher)
+- Yarn or npm
+- Git
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/dumbled00r/CrossChainSwap
+cd CrossChainSwap
+yarn
+```
+
+After that, you want to modify the `.env.example` file to `.env`, and fill in the details here
+
+Executing swap:
+
+```bash
+yarn task tradeSendTrade amount destChain --network srcChain
+```
+
+Example of swap from Avalanche to Ethereum:
+
+```bash
+yarn task tradeSendTrade 0.01 ethereum --network avalanche
 ```

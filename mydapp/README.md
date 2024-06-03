@@ -28,16 +28,8 @@ cd CrossChainSwap
 yarn
 ```
 
-After that, you want to modify the `.env.example` file to `.env`, and fill in the details here
-
-Executing swap:
+To run the website on local
 
 ```bash
-yarn task tradeSendTrade amount destChain --network srcChain
-```
-
-Example of swap from Avalanche to Ethereum:
-
-```bash
-yarn task tradeSendTrade 0.01 ethereum --network avalanche
+yarn dev
 ```
